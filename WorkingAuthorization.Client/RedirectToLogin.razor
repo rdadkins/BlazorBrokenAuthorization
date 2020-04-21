@@ -1,0 +1,36 @@
+﻿@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject NavigationManager Navigation
+
+@if (IsAuthenticated)
+{
+  <p>You are not allowed to view this resource.</p>
+}
+else
+{
+  <p>Redirecting you to the login page...</p>
+}
+
+@code {
+
+  public bool IsAuthenticated { get; set; }
+
+  [CascadingParameter]
+  public Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+  protected override async Task OnInitializedAsync()
+  {
+    var state = await AuthenticationStateTask;
+
+    if (state.User?.Identity == null || !state.User.Identity.IsAuthenticated)
+    {
+      IsAuthenticated = false;
+      Navigation.NavigateTo($"authentication/login?returnUrl={Navigation.Uri}");
+    }
+    else
+    {
+      IsAuthenticated = true;
+    }
+  }
+}
